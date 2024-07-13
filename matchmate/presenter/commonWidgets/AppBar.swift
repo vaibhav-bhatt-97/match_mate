@@ -21,22 +21,15 @@ struct appBar: View {
                 HStack {
                     Spacer()
                     Text("Match Mate")
-//                        .scaleEffect(size)
                         .font(.custom("DancingScript-Bold", size: 35))
                         .foregroundColor(.white)
                         .frame(alignment: .bottom)
-//                        .onAppear{
-//                            withAnimation(.bouncy(duration: 1)){
-//                                self.size = 1
-//                            }
-//                        }
                     Spacer()
                 }
                 .padding(.vertical,8)
                 .background(Color.pink)
                 .frame(maxWidth: .infinity)
-                .matchedGeometryEffect(id: "splash", in: nameSpace)
-                .frame(height: 45)
+                .matchedGeometryEffect(id: "splash", in: nameSpace, properties: .frame)
                 Spacer()
                 
             } else {
@@ -44,7 +37,7 @@ struct appBar: View {
                     Spacer()
                     Text("Match Mate")
                         .scaleEffect(size)
-                        .font(.custom("DancingScript-Bold", size: 50))
+                        .font(.custom("DancingScript-Bold", size: 35))
                         .foregroundColor(.white)
                         .onAppear{
                             withAnimation(.bouncy(duration: 1)){
@@ -56,8 +49,7 @@ struct appBar: View {
                 .frame(maxWidth: .infinity)
                 .frame(maxHeight: .infinity,alignment:.center)
                 .background(Color.pink)
-                .matchedGeometryEffect(id: "splash", in: nameSpace)
-                
+                .matchedGeometryEffect(id: "splash", in: nameSpace, properties: .frame)
             }
         }
     }

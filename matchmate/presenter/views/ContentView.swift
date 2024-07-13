@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  matchmate
 //
-//  Created by Vaibhav Bhatt on 11/07/24.
+//  Created by Vaibhav Bhatt on 13/07/24.
 //
 
 import SwiftUI
@@ -10,7 +10,7 @@ import CoreData
 
 struct ContentView: View {
     @StateObject private var networkMonitor = NetworkMonitor()
-
+    
     @Environment(\.managedObjectContext) private var viewContext
     //Fetches data from local Database.
     @FetchRequest(
@@ -22,32 +22,52 @@ struct ContentView: View {
     @Namespace var nameSpace
     @State private var isDataLoaded: Bool = false
     @State private var showNetworkErrorView: Bool = false
-
+    @State private var showGeneralErrorView: Bool = false
+    @State private var errorMessage: String = "Unknown error"
+    @State private var page:Int = 1
+    @State private var results:Int = 10
+    
     var body: some View {
         NavigationView {
             ZStack{
-                VStack(spacing:0){
-                    Spacer()
-                        .frame(height: 100)
-                        .background(Color.pink)
-                    if isDataLoaded {
-                        ScrollView {
-                            ForEach(matches) { match in
-                                CardView(
-                                    isAccepted: match.accepted ?? "" ,
-                                    title: match.name?.first ?? "nil",
-                                    subtitle: match.location?.city ?? "nil",
-                                    imageUrl: match.picture?.large ?? "nil",
-                                       onAccept: {
-                                           print("Accepted")
-                                          action(match: match, isAccepted: "yes")
-                                       },
-                                       onReject: {
-                                           print("Rejected")
-                                           action(match: match, isAccepted: "no")
-                                       }
-                                   )
+                if !showGeneralErrorView{
+                    VStack(spacing:0){
+                        Spacer()
+                            .frame(height: 100)
+                            .background(Color.pink)
+                        if isDataLoaded {
+                            ScrollView {
+                                LazyVStack{
+                                    ForEach(matches) { match in
+                                        CardView(
+                                            isAccepted: match.accepted ?? "" ,
+                                            title: match.name?.first ?? "",
+                                            subtitle: match.location?.city ?? "",
+                                            imageUrl: match.picture?.large ?? "",
+                                            onAccept: {
+                                                action(match: match, isAccepted: "yes")
+                                            },
+                                            onReject: {
+                                                action(match: match, isAccepted: "no")
+                                            }
+                                        ).onAppear{
+                                            //                                            This will fetch more matches when reached to the last card.
+                                            if match == matches.last {
+                                                DispatchQueue.global(qos: .background).async {
+                                                    page+=1
+                                                    viewModel.getMatches(page: page, results: results)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                        }
+                    }
+                }else{
+                    GeneralErrorView(errorMessage: errorMessage) {
+                        DispatchQueue.global(qos: .background).async {
+                            viewModel.getMatches(page: page, results: results)
                         }
                     }
                 }
@@ -57,26 +77,44 @@ struct ContentView: View {
             .edgesIgnoringSafeArea(.all)
         }
         .onAppear{
-            networkMonitor.$isConnected
-               .receive(on: RunLoop.main)
-               .sink { isConnected in
-                   print("Network connection status: \(isConnected)")
-                   if !isConnected {
-                       showNetworkErrorView = true
-                   }else{
-                       showNetworkErrorView = false
-                   }
-               }
-               .store(in: &networkMonitor.cancellables)
-            viewModel.getMatches()
+            
+            
+            DispatchQueue.global(qos: .background).async {
+                networkMonitor.$isConnected
+                    .receive(on: RunLoop.main)
+                    .sink { isConnected in
+                        debugPrint("Network connection status: \(isConnected)")
+                        if !isConnected {
+                            showNetworkErrorView = true
+                        }else{
+                            showNetworkErrorView = false
+                        }
+                    }
+                    .store(in: &networkMonitor.cancellables)
+                viewModel.getMatches(page: page, results: results)
+            }
         }
         .onChange(of: viewModel.listOfMatches) { newMatches in
             withAnimation(.bouncy){
                 isDataLoaded = true
             }
-            addItem(newMatches: newMatches)
+            DispatchQueue.global(qos: .background).async {
+                addItem(newMatches: newMatches)
+            }
         }
-        .sheet(isPresented: $showNetworkErrorView){
+        .onChange(of: viewModel.errorFromGetMatches){error in
+            print("ERROR from getmatch API caught--->>>\(error)")
+            showGeneralErrorView = true
+            errorMessage = error
+            withAnimation(.bouncy){
+                isDataLoaded = true
+            }
+        }
+        .sheet(isPresented: $showNetworkErrorView, onDismiss: {
+            DispatchQueue.global(qos: .background).async {
+                saveNetworkTimeStamp()
+            }
+        }){
             NetworkErrorView(showNetworkErrorView: $showNetworkErrorView)
         }
     }
@@ -88,7 +126,6 @@ struct ContentView: View {
             let result = try viewContext.fetch(request)
             if result.isEmpty {
                 let newMatch = DBMatch(context: viewContext)
-                // Assuming name and picture are relationships and not embedded objects
                 let name = DBName(context: viewContext)
                 name.first = match.name?.first
                 name.last = match.name?.last
@@ -106,7 +143,7 @@ struct ContentView: View {
                 location.country = match.location?.country
                 location.state = match.location?.state
                 newMatch.location = location
-
+                
                 // Set other properties of DBMatch
                 newMatch.gender = match.gender
                 newMatch.email = match.email
@@ -118,8 +155,6 @@ struct ContentView: View {
                 newMatch.accepted = isAccepted
             }else{
                 guard let existingMatch = result.first else{return}
-//                let newMatch = DBMatch(context: viewContext)
-                // Assuming name and picture are relationships and not embedded objects
                 let name = DBName(context: viewContext)
                 name.first = match.name?.first
                 name.last = match.name?.last
@@ -137,7 +172,7 @@ struct ContentView: View {
                 location.country = match.location?.country
                 location.state = match.location?.state
                 existingMatch.location = location
-
+                
                 // Set other properties of DBMatch
                 existingMatch.gender = match.gender
                 existingMatch.email = match.email
@@ -149,7 +184,6 @@ struct ContentView: View {
         }catch let error{
             print("error from update match->\(error)")
         }
-        
         do {
             try viewContext.save()
         } catch {
@@ -159,43 +193,63 @@ struct ContentView: View {
     }
     //Adds new matches from API to Database
     private func addItem(newMatches: [Match]) {
-        print("----------we are in add item now----------")
-             newMatches.forEach { match in
-                 let newMatch = DBMatch(context: viewContext)
-                 // Assuming name and picture are relationships and not embedded objects
-                 let name = DBName(context: viewContext)
-                 name.first = match.name?.first
-                 name.last = match.name?.last
-                 name.title = match.name?.title
-                 newMatch.name = name
-                 
-                 let picture = DBPicture(context: viewContext)
-                 picture.large = match.picture?.large
-                 picture.medium = match.picture?.medium
-                 picture.thumbnail = match.picture?.thumbnail
-                 newMatch.picture = picture
-                 
-                 let location = DBLocation(context:viewContext)
-                 location.city = match.location?.city
-                 location.country = match.location?.country
-                 location.state = match.location?.state
-                 newMatch.location = location
-
-                 // Set other properties of DBMatch
-                 newMatch.gender = match.gender
-                 newMatch.email = match.email
-                 newMatch.phone = match.phone
-                 newMatch.cell = match.cell
-                 newMatch.nat = match.nat
-                 newMatch.timeStamp = Date()
-                 newMatch.id = UUID()
-             }
-
-             do {
-                 try viewContext.save()
-             } catch {
-                 let nsError = error as NSError
-                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-             }
-     }
+        newMatches.forEach { match in
+            let newMatch = DBMatch(context: viewContext)
+            let name = DBName(context: viewContext)
+            name.first = match.name?.first
+            name.last = match.name?.last
+            name.title = match.name?.title
+            newMatch.name = name
+            
+            let picture = DBPicture(context: viewContext)
+            picture.large = match.picture?.large
+            picture.medium = match.picture?.medium
+            picture.thumbnail = match.picture?.thumbnail
+            newMatch.picture = picture
+            
+            let location = DBLocation(context:viewContext)
+            location.city = match.location?.city
+            location.country = match.location?.country
+            location.state = match.location?.state
+            newMatch.location = location
+            
+            // Set other properties of DBMatch
+            newMatch.gender = match.gender
+            newMatch.email = match.email
+            newMatch.phone = match.phone
+            newMatch.cell = match.cell
+            newMatch.nat = match.nat
+            newMatch.timeStamp = Date()
+            newMatch.id = UUID()
+        }
+        
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
+    //Handles saving and updating of network TimeStamp for offline mode
+    private func saveNetworkTimeStamp(){
+        let request = DBNetworkTimeStamp.fetchRequest()
+        do{
+            let result = try viewContext.fetch(request)
+            if result.isEmpty {
+                let newNetworkTimeStamp = DBNetworkTimeStamp(context: viewContext)
+                newNetworkTimeStamp.timeStamp = Date()
+            }else{
+                guard let existingNetworkTimeStamp = result.first else{return}
+                existingNetworkTimeStamp.timeStamp = Date()
+            }
+        }catch let error {
+            print(error)
+        }
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
 }

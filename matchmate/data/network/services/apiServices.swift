@@ -2,22 +2,23 @@
 //  apiServices.swift
 //  matchmate
 //
-//  Created by Vaibhav Bhatt on 12/07/24.
+//  Created by Vaibhav Bhatt on 13/07/24.
 //
 import Foundation
 import Alamofire
 
 class APIService{
     func makeRequest(
-         endPoint: String,
-         httpMethod: HTTPMethod,
-         requestBody: Parameters?,
-         paths: Dictionary<String, Any>?,
-         queryParameter: Dictionary<String, Any>? = [:],
-         completion: @escaping (Result<Data?, Error>) -> Void
+        endPoint: String,
+        httpMethod: HTTPMethod,
+        requestBody: Parameters?,
+        paths: Dictionary<String, Any>?,
+        queryParameter: Dictionary<String, Any>? = [:],
+        completion: @escaping (Result<Data?, Error>) -> Void
     ) {
-        print("===================\(endPoint)")
-        let requestUrl = utils().getURLWithPath(URL: EndPoints.baseURL + endPoint, paths: paths ?? [:])
+        
+        let requestUrl = utils().getURLWithPath(url: EndPoints.baseURL + endPoint, paths: paths ?? [:])
+        debugPrint("Endpoint:- \(requestUrl)")
         AF.request(
             requestUrl,
             method: httpMethod,

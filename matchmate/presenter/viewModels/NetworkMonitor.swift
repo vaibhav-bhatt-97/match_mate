@@ -13,7 +13,7 @@ class NetworkMonitor: ObservableObject {
     private var monitor: NWPathMonitor
     private var queue: DispatchQueue
     
-    @Published var isConnected: Bool = true // Assume connected initially to avoid flashing the error screen
+    @Published var isConnected: Bool = true
     
     var cancellables = Set<AnyCancellable>()
     
@@ -23,7 +23,7 @@ class NetworkMonitor: ObservableObject {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
                 self?.isConnected = path.status == .satisfied
-                print("Network connection status: \(self?.isConnected ?? false)")
+                debugPrint("Network connection status: \(self?.isConnected ?? false)")
             }
         }
         monitor.start(queue: queue)

@@ -15,12 +15,12 @@ struct CardView: View {
         switch width {
         case -500...(-150):
             print("Declined")
-//            offset = CGSize(width: -500, height: 0)
+            //            offset = CGSize(width: -500, height: 0)
             onReject()
             offset = .zero
         case 150...500:
             print("Accepted")
-//            offset = CGSize(width: 500, height: 0)
+            //            offset = CGSize(width: 500, height: 0)
             onAccept()
             offset = .zero
         default:
@@ -134,8 +134,9 @@ struct CardView: View {
         .frame(width: 350, height: 500)
         .background(Color.white)
         .cornerRadius(20)
-        .shadow(color: .pink.opacity(0.2), radius: 5, x: 2, y: 2)
+        .shadow(color: .pink.opacity(0.2), radius: 5, x: 4, y: 4)
         .padding()
+        //Below modifiers helps in creating the swipe effect of cards
         .offset(x: offset.width, y: offset.height * 0.4)
         .rotationEffect(.degrees(Double(offset.width / 30)))
         .gesture(

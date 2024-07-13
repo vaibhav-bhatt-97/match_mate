@@ -25,6 +25,10 @@
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="matches" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBMatch" inverseName="name" inverseEntity="DBMatch"/>
     </entity>
+    <entity name="DBNetworkTimeStamp" representedClassName="DBNetworkTimeStamp" syncable="YES">
+        <attribute name="isDataSynchronized" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
     <entity name="DBPicture" representedClassName="DBPicture" syncable="YES">
         <attribute name="large" optional="YES" attributeType="String"/>
         <attribute name="medium" optional="YES" attributeType="String"/>

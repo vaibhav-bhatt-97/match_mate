@@ -2,7 +2,7 @@
 //  match.swift
 //  matchmate
 //
-//  Created by Vaibhav Bhatt on 12/07/24.
+//  Created by Vaibhav Bhatt on 13/07/24.
 //
 
 // To parse the JSON, add this file to your project and do:
@@ -26,17 +26,17 @@ struct Match: Codable, Equatable {
     
     static func == (lhs: Match, rhs: Match) -> Bool {
         return lhs.gender == rhs.gender &&
-            lhs.name == rhs.name &&
-            lhs.location == rhs.location &&
-            lhs.email == rhs.email &&
-            lhs.login == rhs.login &&
-            lhs.dob == rhs.dob &&
-            lhs.registered == rhs.registered &&
-            lhs.phone == rhs.phone &&
-            lhs.cell == rhs.cell &&
-            lhs.id == rhs.id &&
-            lhs.picture == rhs.picture &&
-            lhs.nat == rhs.nat
+        lhs.name == rhs.name &&
+        lhs.location == rhs.location &&
+        lhs.email == rhs.email &&
+        lhs.login == rhs.login &&
+        lhs.dob == rhs.dob &&
+        lhs.registered == rhs.registered &&
+        lhs.phone == rhs.phone &&
+        lhs.cell == rhs.cell &&
+        lhs.id == rhs.id &&
+        lhs.picture == rhs.picture &&
+        lhs.nat == rhs.nat
     }
 }
 
@@ -55,7 +55,7 @@ struct ID: Codable, Equatable {
 struct Location: Codable, Equatable {
     let street: Street?
     let city, state, country: String?
-//    let postcode: Int?
+    //    let postcode: Int?
     let coordinates: Coordinates?
     let timezone: Timezone?
 }

@@ -8,7 +8,7 @@
 import Foundation
 class GetMatchesUseCase{
     func execute(matchesRepository: MatchesRepository,page: Int, results: Int, completion: @escaping (Result<[Match], Error>) -> Void){
-        matchesRepository.getMatches(results:results,page: page){result in
+        matchesRepository.getMatches(results: results,page: page){result in
             switch result{
             case .success(let matches):
                 completion(.success(matches))
