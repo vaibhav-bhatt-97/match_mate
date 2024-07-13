@@ -18,6 +18,7 @@ struct ContentView: View {
         animation: .default
     )
     private var matches: FetchedResults<DBMatch>
+//    private var NetworkTimeStamp: FetchedResults<DBNetworkTimeStamp>
     @StateObject private var viewModel = ViewModel()
     @Namespace var nameSpace
     @State private var isDataLoaded: Bool = false
@@ -26,6 +27,7 @@ struct ContentView: View {
     @State private var errorMessage: String = "Unknown error"
     @State private var page:Int = 1
     @State private var results:Int = 10
+    @State var showInstructionsView:Bool = false
     
     var body: some View {
         NavigationView {
@@ -72,14 +74,27 @@ struct ContentView: View {
                     }
                 }
                 appBar(isDataLoaded: $isDataLoaded)
+                if(isDataLoaded && showInstructionsView){
+                    InstructionsView {
+                        print("we are back from instructionview screen")
+                        showInstructionsView = false
+                    }
+                }
             }
             .background(Color.pink.opacity(0.05))
             .edgesIgnoringSafeArea(.all)
         }
         .onAppear{
-            
+           
             
             DispatchQueue.global(qos: .background).async {
+                //Below code is for displaying instruction for new user
+                if let savedValue = UserDefaults.standard.string(forKey: "isFisrtTimeUser") {
+                }else{
+                    UserDefaults.standard.set(false, forKey: "isFisrtTimeUser")
+                    showInstructionsView = true
+                }
+                //Below code check for network connection
                 networkMonitor.$isConnected
                     .receive(on: RunLoop.main)
                     .sink { isConnected in
@@ -91,7 +106,8 @@ struct ContentView: View {
                         }
                     }
                     .store(in: &networkMonitor.cancellables)
-                viewModel.getMatches(page: page, results: results)
+               //Below code fetches fresh matches from API.
+                    viewModel.getMatches(page: page, results: results)
             }
         }
         .onChange(of: viewModel.listOfMatches) { newMatches in
@@ -103,7 +119,7 @@ struct ContentView: View {
             }
         }
         .onChange(of: viewModel.errorFromGetMatches){error in
-            print("ERROR from getmatch API caught--->>>\(error)")
+            debugPrint("ERROR from getmatch API caught--->>>\(error)")
             showGeneralErrorView = true
             errorMessage = error
             withAnimation(.bouncy){

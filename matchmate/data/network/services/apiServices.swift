@@ -17,7 +17,7 @@ class APIService{
         completion: @escaping (Result<Data?, Error>) -> Void
     ) {
         
-        let requestUrl = utils().getURLWithPath(url: EndPoints.baseURL + endPoint, paths: paths ?? [:])
+        let requestUrl = Utils().getURLWithPath(url: EndPoints.baseURL + endPoint, paths: paths ?? [:])
         debugPrint("Endpoint:- \(requestUrl)")
         AF.request(
             requestUrl,

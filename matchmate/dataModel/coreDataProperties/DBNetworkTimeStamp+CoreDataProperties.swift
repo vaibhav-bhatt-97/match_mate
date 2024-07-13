@@ -18,6 +18,7 @@ extension DBNetworkTimeStamp {
 
     @NSManaged public var timeStamp: Date?
     @NSManaged public var isDataSynchronized: Bool
+    @NSManaged public var firstTimeUser: Bool
 
 }
 
