@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="DBLocation" representedClassName="DBLocation" syncable="YES">
+        <attribute name="city" optional="YES" attributeType="String"/>
+        <attribute name="country" optional="YES" attributeType="String"/>
+        <attribute name="state" optional="YES" attributeType="String"/>
+        <relationship name="matches" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBMatch" inverseName="location" inverseEntity="DBMatch"/>
+    </entity>
+    <entity name="DBMatch" representedClassName="DBMatch" syncable="YES">
+        <attribute name="accepted" optional="YES" attributeType="String"/>
+        <attribute name="cell" optional="YES" attributeType="String"/>
+        <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="gender" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="nat" optional="YES" attributeType="String"/>
+        <attribute name="phone" optional="YES" attributeType="String"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="location" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBLocation" inverseName="matches" inverseEntity="DBLocation"/>
+        <relationship name="name" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBName" inverseName="matches" inverseEntity="DBName"/>
+        <relationship name="picture" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBPicture" inverseName="matches" inverseEntity="DBPicture"/>
+    </entity>
+    <entity name="DBName" representedClassName="DBName" syncable="YES">
+        <attribute name="first" optional="YES" attributeType="String"/>
+        <attribute name="last" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="matches" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBMatch" inverseName="name" inverseEntity="DBMatch"/>
+    </entity>
+    <entity name="DBPicture" representedClassName="DBPicture" syncable="YES">
+        <attribute name="large" optional="YES" attributeType="String"/>
+        <attribute name="medium" optional="YES" attributeType="String"/>
+        <attribute name="thumbnail" optional="YES" attributeType="String"/>
+        <relationship name="matches" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DBMatch" inverseName="picture" inverseEntity="DBMatch"/>
+    </entity>
+</model>
