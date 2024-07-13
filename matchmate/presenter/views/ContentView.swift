@@ -39,7 +39,6 @@ struct ContentView: View {
                             .background(Color.pink)
                         if isDataLoaded {
                             ScrollView {
-                                LazyVStack{
                                     ForEach(matches) { match in
                                         CardView(
                                             isAccepted: match.accepted ?? "" ,
@@ -52,17 +51,11 @@ struct ContentView: View {
                                             onReject: {
                                                 action(match: match, isAccepted: "no")
                                             }
-                                        ).onAppear{
-                                            //                                            This will fetch more matches when reached to the last card.
-                                            if match == matches.last {
-                                                DispatchQueue.global(qos: .background).async {
-                                                    page+=1
-                                                    viewModel.getMatches(page: page, results: results)
-                                                }
-                                            }
-                                        }
+                                        )
                                     }
-                                }
+                            }.refreshable {
+                                page+=1
+                                viewModel.getMatches(page: page, results: results)
                             }
                         }
                     }

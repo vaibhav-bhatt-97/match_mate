@@ -145,7 +145,7 @@ struct InstructionsView: View {
             
             
         }
-        .background(Color.black.opacity(0.5))
+        .background(Color.black.opacity(0.7))
         .onAppear{
             startAnimation()
         }
