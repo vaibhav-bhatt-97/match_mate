@@ -86,18 +86,18 @@ struct InstructionsView: View {
                 default:
                     if arrowRight {
                         VStack{
-                            Image(systemName: "arrowshape.up.fill")
+                            Image(systemName: "arrowshape.down.fill")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .foregroundColor(.white)
                                 .frame(width: 60, height: 60)
                         }
                         .matchedGeometryEffect(id: "splash", in: nameSpace)
-                        .frame(maxHeight: .infinity, alignment: .top)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
                         .padding()
                     }else{
                         VStack{
-                            Image(systemName: "arrowshape.up.fill")
+                            Image(systemName: "arrowshape.down.fill")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .foregroundColor(.white)
@@ -105,7 +105,8 @@ struct InstructionsView: View {
                         }
                         .matchedGeometryEffect(id: "splash", in: nameSpace)
                         .frame(maxHeight: .infinity, alignment: .center)
-                        .padding()                    }
+                        .padding()
+                    }
                 }
                 switch screenNumber{
                     case 0:
@@ -117,7 +118,7 @@ struct InstructionsView: View {
                             .foregroundColor(.white)
                             .font(.title2)
                     default:
-                        Text("Swipe UP to load more matches.")
+                        Text("Swipe DOWN to load more matches.")
                             .foregroundColor(.white)
                             .font(.title2)
                 }
